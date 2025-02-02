@@ -74,6 +74,7 @@ func (h *CountryHandler) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"id":   country.Id,
 		"name": country.Name,
+		"code": country.Code,
 	})
 }
 

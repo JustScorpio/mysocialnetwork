@@ -14,7 +14,7 @@ func NewCountryRepository(db *sql.DB) Repository[models.Country] {
 }
 
 func (r *CountryRepository) GetAll() ([]models.Country, error) {
-	rows, err := r.db.Query("SELECT id, name FROM countries")
+	rows, err := r.db.Query("SELECT id, name, code FROM countries")
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (r *CountryRepository) GetAll() ([]models.Country, error) {
 	var countries []models.Country
 	for rows.Next() {
 		var country models.Country
-		if err := rows.Scan(country.Id, country.Name); err != nil {
+		if err := rows.Scan(country.Id, country.Name, country.Code); err != nil {
 			return nil, err
 		}
 		countries = append(countries, country)
@@ -34,7 +34,7 @@ func (r *CountryRepository) GetAll() ([]models.Country, error) {
 
 func (r *CountryRepository) Get(id int) (*models.Country, error) {
 	var country models.Country
-	err := r.db.QueryRow("SELECT id, name FROM countries WHERE id = ?", id).Scan(&country.Id, &country.Name)
+	err := r.db.QueryRow("SELECT id, name, code FROM countries WHERE id = ?", id).Scan(&country.Id, &country.Name, &country.Code)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (r *CountryRepository) Get(id int) (*models.Country, error) {
 }
 
 func (r *CountryRepository) Create(country *models.Country) error {
-	result, err := r.db.Exec("INSERT INTO countries (name) VALUES (?)", country.Name)
+	result, err := r.db.Exec("INSERT INTO countries (name, code) VALUES (?, ?)", country.Name, country.Code)
 	if err != nil {
 		return err
 	}
@@ -57,7 +57,7 @@ func (r *CountryRepository) Create(country *models.Country) error {
 }
 
 func (r *CountryRepository) Update(country *models.Country) error {
-	_, err := r.db.Exec("UPDATE countries SET name = ?, WHERE id = ?", country.Name, country.Id)
+	_, err := r.db.Exec("UPDATE countries SET name = ?, code = ? WHERE id = ?", country.Name, country.Code, country.Id)
 	return err
 }
 
