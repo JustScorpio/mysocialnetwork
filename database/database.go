@@ -40,10 +40,16 @@ func NewDB() (*sql.DB, error) {
 	defer defaultDB.Close()
 
 	// Проверка и создание базы данных networkdb
-	_, err = defaultDB.Exec(fmt.Sprintf("CREATE DATABASE %s", conf.DbName))
+	var dbExists bool
+	err = defaultDB.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_database WHERE datname = $1)", conf.DbName).Scan(&dbExists)
 	if err != nil {
-		// Если база данных уже существует, игнорируем ошибку
-		if err.Error() != `pq: database "networkdb" already exists` {
+		return nil, fmt.Errorf("failed to check database existence: %w", err)
+	}
+
+	// Создание базы данных, если она не существует
+	if !dbExists {
+		_, err = defaultDB.Exec(fmt.Sprintf("CREATE DATABASE %s", conf.DbName))
+		if err != nil {
 			return nil, fmt.Errorf("failed to create database: %w", err)
 		}
 	}
@@ -55,6 +61,7 @@ func NewDB() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
+	//Проверка подключения
 	if err = db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
