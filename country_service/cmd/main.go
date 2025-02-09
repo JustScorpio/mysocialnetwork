@@ -21,18 +21,18 @@ func main() {
 	countryRepo := repository.NewCountryRepository(db)
 
 	// Инициализация сервисов
-	countryCrudService := services.NewService(countryRepo)
+	countryCrudService := services.NewCrudService(countryRepo)
 
 	// Инициализация обработчиков
-	countryHandler := handlers.NewCountryHandler(countryCrudService)
+	countryCrudHandler := handlers.NewCrudHandler(countryCrudService)
 
 	// Регистрация маршрутов
 	mux := http.NewServeMux()
-	mux.HandleFunc("/countries", countryHandler.GetAll)
-	mux.HandleFunc("/countries/get", countryHandler.Get)
-	mux.HandleFunc("/countries/create", countryHandler.Create)
-	mux.HandleFunc("/countries/update", countryHandler.Update)
-	mux.HandleFunc("/countries/delete", countryHandler.DeleteCountry)
+	mux.HandleFunc("/countries", countryCrudHandler.GetAll)
+	mux.HandleFunc("/countries/get", countryCrudHandler.Get)
+	mux.HandleFunc("/countries/create", countryCrudHandler.Create)
+	mux.HandleFunc("/countries/update", countryCrudHandler.Update)
+	mux.HandleFunc("/countries/delete", countryCrudHandler.Delete)
 
 	// Запуск сервера
 	log.Println("Server started on :8080")

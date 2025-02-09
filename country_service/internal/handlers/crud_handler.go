@@ -8,16 +8,16 @@ import (
 	"strconv"
 )
 
-type CountryHandler struct {
-	countryService *services.Service[models.Country]
+type CrudHandler[T models.Entity] struct {
+	service *services.CrudService[T]
 }
 
-func NewCountryHandler(countryService *services.Service[models.Country]) *CountryHandler {
-	return &CountryHandler{countryService: countryService}
+func NewCrudHandler[T models.Entity](service *services.CrudService[T]) *CrudHandler[T] {
+	return &CrudHandler[T]{service: service}
 }
 
-func (h *CountryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	countries, err := h.countryService.GetAll()
+func (h *CrudHandler[T]) GetAll(w http.ResponseWriter, r *http.Request) {
+	countries, err := h.service.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -27,7 +27,7 @@ func (h *CountryHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(countries)
 }
 
-func (h *CountryHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (h *CrudHandler[T]) Get(w http.ResponseWriter, r *http.Request) {
 	// Извлечение Id из URL-параметра
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -42,28 +42,28 @@ func (h *CountryHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получение страны из сервиса
-	country, err := h.countryService.Get(id)
+	// Получение сущности из сервиса
+	entity, err := h.service.Get(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Возврат страны в формате JSON
+	// Возврат в формате JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(country)
+	json.NewEncoder(w).Encode(entity)
 }
 
-func (h *CountryHandler) Create(w http.ResponseWriter, r *http.Request) {
-	// Декодирование тела запроса в структуру Country
-	var country models.Country
-	if err := json.NewDecoder(r.Body).Decode(&country); err != nil {
+func (h *CrudHandler[T]) Create(w http.ResponseWriter, r *http.Request) {
+	// Декодирование тела запроса в структуру T
+	var entity T
+	if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Создание страны через сервис
-	if err := h.countryService.Create(&country); err != nil {
+	// Создание сущности через сервис
+	if err := h.service.Create(&entity); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -71,23 +71,19 @@ func (h *CountryHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// Возврат успешного статуса
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id":   country.Id,
-		"name": country.Name,
-		"code": country.Code,
-	})
+	json.NewEncoder(w).Encode(entity)
 }
 
-func (h *CountryHandler) Update(w http.ResponseWriter, r *http.Request) {
-	// Декодирование тела запроса в структуру Country
-	var country models.Country
-	if err := json.NewDecoder(r.Body).Decode(&country); err != nil {
+func (h *CrudHandler[T]) Update(w http.ResponseWriter, r *http.Request) {
+	// Декодирование тела запроса в структуру T
+	var entity T
+	if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	// Обновление страны через сервис
-	if err := h.countryService.Update(&country); err != nil {
+	if err := h.service.Update(&entity); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -96,11 +92,11 @@ func (h *CountryHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Country updated successfully",
+		"message": "Entity updated successfully",
 	})
 }
 
-func (h *CountryHandler) DeleteCountry(w http.ResponseWriter, r *http.Request) {
+func (h *CrudHandler[T]) Delete(w http.ResponseWriter, r *http.Request) {
 	// Извлечение ID из URL-параметра
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -116,7 +112,7 @@ func (h *CountryHandler) DeleteCountry(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Удаление страны через сервис
-	if err := h.countryService.Delete(id); err != nil {
+	if err := h.service.Delete(id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -125,6 +121,6 @@ func (h *CountryHandler) DeleteCountry(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "Country deleted successfully",
+		"message": "Entity deleted successfully",
 	})
 }
