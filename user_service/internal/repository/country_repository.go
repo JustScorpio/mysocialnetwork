@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"user-service/internal/models"
+	"user_service/internal/models"
 )
 
 type UserRepository struct {

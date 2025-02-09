@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"country_service/internal/models"
-	"country_service/internal/services"
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"user_service/internal/models"
+	"user_service/internal/services"
 )
 
 type CrudHandler[T models.Entity] struct {
