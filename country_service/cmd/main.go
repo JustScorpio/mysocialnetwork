@@ -1,12 +1,12 @@
 package main
 
 import (
+	"country_service/internal/database"
+	"country_service/internal/handlers"
+	"country_service/internal/repository"
+	"country_service/internal/services"
 	"log"
 	"net/http"
-	"network/database"
-	"network/internal/handlers"
-	"network/internal/repository"
-	"network/internal/services"
 )
 
 func main() {

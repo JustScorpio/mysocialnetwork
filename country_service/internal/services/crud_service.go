@@ -1,8 +1,8 @@
 package services
 
 import (
-	"network/internal/models"
-	"network/internal/repository"
+	"country_service/internal/models"
+	"country_service/internal/repository"
 )
 
 type Service[T models.Entity] struct {

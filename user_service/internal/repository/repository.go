@@ -1,6 +1,6 @@
 package repository
 
-import "network/internal/models"
+import "user-service/internal/models"
 
 type Repository[T models.Entity] interface {
 	GetAll() ([]T, error)

@@ -1,10 +1,10 @@
 package handlers
 
 import (
+	"country_service/internal/models"
+	"country_service/internal/services"
 	"encoding/json"
 	"net/http"
-	"network/internal/models"
-	"network/internal/services"
 	"strconv"
 )
 
