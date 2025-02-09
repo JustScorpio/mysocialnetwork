@@ -14,7 +14,7 @@ func NewUserRepository(db *sql.DB) Repository[models.User] {
 }
 
 func (r *UserRepository) GetAll() ([]models.User, error) {
-	rows, err := r.db.Query("SELECT id, name, mail FROM users")
+	rows, err := r.db.Query("SELECT id, username, mail FROM users")
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (r *UserRepository) GetAll() ([]models.User, error) {
 	var users []models.User
 	for rows.Next() {
 		var user models.User
-		err := rows.Scan(&user.Id, &user.Name, &user.Mail)
+		err := rows.Scan(&user.Id, &user.UserName, &user.Mail)
 		if err != nil {
 			return nil, err
 		}
@@ -35,7 +35,7 @@ func (r *UserRepository) GetAll() ([]models.User, error) {
 
 func (r *UserRepository) Get(id int) (*models.User, error) {
 	var user models.User
-	err := r.db.QueryRow("SELECT id, name, mail FROM users WHERE id = $1", id).Scan(&user.Id, &user.Name, &user.Mail)
+	err := r.db.QueryRow("SELECT id, username, mail FROM users WHERE id = $1", id).Scan(&user.Id, &user.UserName, &user.Mail)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (r *UserRepository) Get(id int) (*models.User, error) {
 }
 
 func (r *UserRepository) Create(user *models.User) error {
-	err := r.db.QueryRow("INSERT INTO users (name, mail) VALUES ($1, $2) RETURNING id", user.Name, user.Mail).Scan(&user.Id)
+	err := r.db.QueryRow("INSERT INTO users (username, mail) VALUES ($1, $2) RETURNING id", user.UserName, user.Mail).Scan(&user.Id)
 	if err != nil {
 		return err
 	}
@@ -52,7 +52,7 @@ func (r *UserRepository) Create(user *models.User) error {
 }
 
 func (r *UserRepository) Update(user *models.User) error {
-	_, err := r.db.Exec("UPDATE users SET name = $1, mail = $2 WHERE id = $3", user.Name, user.Mail, user.Id)
+	_, err := r.db.Exec("UPDATE users SET username = $1, mail = $2 WHERE id = $3", user.UserName, user.Mail, user.Id)
 	return err
 }
 

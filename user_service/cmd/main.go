@@ -35,6 +35,6 @@ func main() {
 	mux.HandleFunc("/countries/delete", userHandler.Delete)
 
 	// Запуск сервера
-	log.Println("Server started on :8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	log.Println("Server started on :8081")
+	log.Fatal(http.ListenAndServe(":8081", mux))
 }
