@@ -1,23 +1,23 @@
 package handlers
 
 import (
+	"country_service/internal/models"
+	"country_service/internal/services"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"user-service/internal/models"
-	"user-service/internal/services"
 )
 
-type UserHandler struct {
-	userService *services.Service[models.User]
+type CrudHandler[T models.Entity] struct {
+	service *services.CrudService[T]
 }
 
-func NewUserHandler(userService *services.Service[models.User]) *UserHandler {
-	return &UserHandler{userService: userService}
+func NewCrudHandler[T models.Entity](service *services.CrudService[T]) *CrudHandler[T] {
+	return &CrudHandler[T]{service: service}
 }
 
-func (h *UserHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	countries, err := h.userService.GetAll()
+func (h *CrudHandler[T]) GetAll(w http.ResponseWriter, r *http.Request) {
+	countries, err := h.service.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -27,7 +27,7 @@ func (h *UserHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(countries)
 }
 
-func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
+func (h *CrudHandler[T]) Get(w http.ResponseWriter, r *http.Request) {
 	// Извлечение Id из URL-параметра
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -42,28 +42,28 @@ func (h *UserHandler) Get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Получение пользователя из сервиса
-	user, err := h.userService.Get(id)
+	// Получение сущности из сервиса
+	entity, err := h.service.Get(id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Возврат пользователя в формате JSON
+	// Возврат в формате JSON
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(user)
+	json.NewEncoder(w).Encode(entity)
 }
 
-func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
-	// Декодирование тела запроса в структуру User
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+func (h *CrudHandler[T]) Create(w http.ResponseWriter, r *http.Request) {
+	// Декодирование тела запроса в структуру T
+	var entity T
+	if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
-	// Создание страны через сервис
-	if err := h.userService.Create(&user); err != nil {
+	// Создание сущности через сервис
+	if err := h.service.Create(&entity); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -71,23 +71,19 @@ func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	// Возврат успешного статуса
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id":   user.Id,
-		"name": user.Name,
-		"user": user.Mail,
-	})
+	json.NewEncoder(w).Encode(entity)
 }
 
-func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
-	// Декодирование тела запроса в структуру User
-	var user models.User
-	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+func (h *CrudHandler[T]) Update(w http.ResponseWriter, r *http.Request) {
+	// Декодирование тела запроса в структуру T
+	var entity T
+	if err := json.NewDecoder(r.Body).Decode(&entity); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
 	// Обновление страны через сервис
-	if err := h.userService.Update(&user); err != nil {
+	if err := h.service.Update(&entity); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -96,11 +92,11 @@ func (h *UserHandler) Update(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "User updated successfully",
+		"message": "Entity updated successfully",
 	})
 }
 
-func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *CrudHandler[T]) Delete(w http.ResponseWriter, r *http.Request) {
 	// Извлечение ID из URL-параметра
 	idStr := r.URL.Query().Get("id")
 	if idStr == "" {
@@ -116,7 +112,7 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Удаление страны через сервис
-	if err := h.userService.Delete(id); err != nil {
+	if err := h.service.Delete(id); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -125,6 +121,6 @@ func (h *UserHandler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "User deleted successfully",
+		"message": "Entity deleted successfully",
 	})
 }

@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 	"net/http"
-	"user-service/internal/database"
-	"user-service/internal/handlers"
-	"user-service/internal/repository"
-	"user-service/internal/services"
+	"user_service/internal/database"
+	"user_service/internal/handlers"
+	"user_service/internal/repository"
+	"user_service/internal/services"
 )
 
 func main() {
@@ -21,10 +21,10 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 
 	// Инициализация сервисов
-	userCrudService := services.NewService(userRepo)
+	userCrudService := services.NewCrudService(userRepo)
 
 	// Инициализация обработчиков
-	userHandler := handlers.NewUserHandler(userCrudService)
+	userHandler := handlers.NewCrudHandler(userCrudService)
 
 	// Регистрация маршрутов
 	mux := http.NewServeMux()
@@ -32,7 +32,7 @@ func main() {
 	mux.HandleFunc("/countries/get", userHandler.Get)
 	mux.HandleFunc("/countries/create", userHandler.Create)
 	mux.HandleFunc("/countries/update", userHandler.Update)
-	mux.HandleFunc("/countries/delete", userHandler.DeleteUser)
+	mux.HandleFunc("/countries/delete", userHandler.Delete)
 
 	// Запуск сервера
 	log.Println("Server started on :8080")
