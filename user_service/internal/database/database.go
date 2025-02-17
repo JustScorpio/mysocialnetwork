@@ -54,7 +54,7 @@ func NewDB() (*sql.DB, error) {
 		}
 	}
 
-	// Подключение к созданной базе данных networkdb
+	// Подключение к созданной базе данных
 	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", conf.Host, conf.User, conf.Password, conf.DbName, conf.Port, conf.SslMode)
 	db, err := sql.Open("postgres", connString)
 	if err != nil {
@@ -66,13 +66,27 @@ func NewDB() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
+	// Создание кэш-таблицы Countries, если её нет
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS countries (
+    		id INTEGER PRIMARY KEY, --not serial because primary key must math main table
+    		name TEXT NOT NULL
+		);
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cache-table Countries: %w", err)
+	}
+
 	// Создание таблицы Users, если её нет
 	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS Users (
-			id SERIAL PRIMARY KEY,
-			name TEXT NOT NULL,
-			mail TEXT NOT NULL UNIQUE
-		)
+		CREATE TABLE IF NOT EXISTS users (
+    		id SERIAL PRIMARY KEY,
+    		username TEXT UNIQUE NOT NULL,
+    		name TEXT NOT NULL,
+    		passwordhash VARCHAR(60) NOT NULL,
+    		mail TEXT UNIQUE NOT NULL,
+    		country INT REFERENCES countries(id) ON DELETE SET NULL
+		);
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create table Users: %w", err)

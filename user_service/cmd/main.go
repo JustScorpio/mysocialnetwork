@@ -18,7 +18,8 @@ func main() {
 	defer db.Close()
 
 	// Инициализация репозиториев
-	userRepo := repository.NewUserRepository(db)
+	countryCacheRepository := repository.NewCountryRepository(db)
+	userRepo := repository.NewUserRepository(db, countryCacheRepository)
 
 	// Инициализация сервисов
 	userCrudService := services.NewCrudService(userRepo)

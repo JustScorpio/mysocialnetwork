@@ -39,7 +39,7 @@ func NewDB() (*sql.DB, error) {
 	}
 	defer defaultDB.Close()
 
-	// Проверка и создание базы данных networkdb
+	// Проверка и создание базы данных
 	var dbExists bool
 	err = defaultDB.QueryRow("SELECT EXISTS (SELECT 1 FROM pg_database WHERE datname = $1)", conf.DbName).Scan(&dbExists)
 	if err != nil {
@@ -68,11 +68,11 @@ func NewDB() (*sql.DB, error) {
 
 	// Создание таблицы Countries, если её нет
 	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS Countries (
-			id SERIAL PRIMARY KEY,
-			name TEXT NOT NULL,
-			code TEXT NOT NULL UNIQUE
-		)
+		CREATE TABLE IF NOT EXISTS countries (
+    		id SERIAL PRIMARY KEY,
+    		name TEXT NOT NULL,
+    		code VARCHAR(2) UNIQUE NOT NULL
+		);
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create table Countries: %w", err)

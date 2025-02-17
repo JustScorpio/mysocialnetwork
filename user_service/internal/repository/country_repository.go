@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"country_service/internal/models"
 	"database/sql"
+	"user_service/internal/models"
 )
 
 type CountryRepository struct {
@@ -14,7 +14,10 @@ func NewCountryRepository(db *sql.DB) *CountryRepository {
 }
 
 func (r *CountryRepository) GetAll() ([]models.Country, error) {
-	rows, err := r.db.Query("SELECT id, name, code FROM countries")
+	rows, err := r.db.Query(`
+	SELECT id, name
+	FROM countries
+	`)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +26,7 @@ func (r *CountryRepository) GetAll() ([]models.Country, error) {
 	var countries []models.Country
 	for rows.Next() {
 		var country models.Country
-		err := rows.Scan(&country.Id, &country.Name, &country.Code)
+		err := rows.Scan(&country.Id, &country.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -35,7 +38,11 @@ func (r *CountryRepository) GetAll() ([]models.Country, error) {
 
 func (r *CountryRepository) Get(id int) (*models.Country, error) {
 	var country models.Country
-	err := r.db.QueryRow("SELECT id, name, code FROM countries WHERE id = $1", id).Scan(&country.Id, &country.Name, &country.Code)
+	err := r.db.QueryRow(`
+		SELECT id, name
+		FROM countries 
+		WHERE id = $1
+		`, id).Scan(&country.Id, &country.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +50,11 @@ func (r *CountryRepository) Get(id int) (*models.Country, error) {
 }
 
 func (r *CountryRepository) Create(country *models.Country) error {
-	err := r.db.QueryRow("INSERT INTO countries (name, code) VALUES ($1, $2) RETURNING id", country.Name, country.Code).Scan(&country.Id)
+	err := r.db.QueryRow(`
+	INSERT INTO countries (id, name) 
+	VALUES ($1, $2) 
+	RETURNING id
+	`, country.Id, country.Name).Scan(&country.Id)
 	if err != nil {
 		return err
 	}
@@ -52,11 +63,17 @@ func (r *CountryRepository) Create(country *models.Country) error {
 }
 
 func (r *CountryRepository) Update(country *models.Country) error {
-	_, err := r.db.Exec("UPDATE countries SET name = $1, code = $2 WHERE id = $3", country.Name, country.Code, country.Id)
+	_, err := r.db.Exec(`
+	UPDATE countries SET name = $1
+	WHERE id = $6
+	`, country.Name, country.Id)
 	return err
 }
 
 func (r *CountryRepository) Delete(id int) error {
-	_, err := r.db.Exec("DELETE FROM countries WHERE id = $1", id)
+	_, err := r.db.Exec(`
+	DELETE FROM countries 
+	WHERE id = $1
+	`, id)
 	return err
 }

@@ -17,14 +17,14 @@ func NewCrudHandler[T models.Entity](service *services.CrudService[T]) *CrudHand
 }
 
 func (h *CrudHandler[T]) GetAll(w http.ResponseWriter, r *http.Request) {
-	countries, err := h.service.GetAll()
+	entities, err := h.service.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(countries)
+	json.NewEncoder(w).Encode(entities)
 }
 
 func (h *CrudHandler[T]) Get(w http.ResponseWriter, r *http.Request) {

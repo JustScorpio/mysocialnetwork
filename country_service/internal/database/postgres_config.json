@@ -2,7 +2,7 @@
     "host": "127.0.0.1 ",
     "user": "postgres",
     "password": "1Qwerty",
-    "dbname": "networkdb",
+    "dbname": "country_service_db",
     "port": "5432",
     "sslmode": "disable"
 }
