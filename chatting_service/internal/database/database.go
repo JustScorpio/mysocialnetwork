@@ -66,30 +66,54 @@ func NewDB() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	// Создание кэш-таблицы Countries, если её нет
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS countries (
-    		id INTEGER PRIMARY KEY, --not serial because primary key must math main table
-    		name TEXT NOT NULL
-		);
-	`)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create cache-table Countries: %w", err)
-	}
-
-	// Создание таблицы Users, если её нет
+	// Создание кэш-таблицы Users, если её нет
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
-    		id SERIAL PRIMARY KEY,
-    		username TEXT UNIQUE NOT NULL,
+    		id INTEGER PRIMARY KEY, --not serial because primary key must math main table
     		name TEXT NOT NULL,
-    		passwordhash VARCHAR(60) NOT NULL,
-    		mail TEXT UNIQUE NOT NULL,
-    		country INT REFERENCES countries(id) ON DELETE SET NULL
+			username TEXT NOT NULL
 		);
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create table Users: %w", err)
+		return nil, fmt.Errorf("failed to create cache-table users: %w", err)
+	}
+
+	// Создание таблицы chats, если её нет
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS chats (
+    		id SERIAL PRIMARY KEY,
+    		createdat DATETIME NOT NULL,
+    		owner INT REFERENCES users(id) ON DELETE SET NULL
+		);
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create table chats: %w", err)
+	}
+
+	// Создание таблицы chat_to_participants, если её нет
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS chat_to_participants (
+    		id SERIAL PRIMARY KEY,
+    		chat INT REFERENCES chats(id) ON DELETE SET NULL,
+			participant INT REFERENCES users(id) ON DELETE SET NULL
+		);
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create table chat_to_participants: %w", err)
+	}
+
+	// Создание таблицы messages, если её нет
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS messages (
+    		id SERIAL PRIMARY KEY,
+    		sendtime DATETIME NOT NULL,
+    		content TEXT NOT NULL,
+    		author INT REFERENCES users(id) ON DELETE SET NULL,
+			chat INT REFERENCES chats(id) ON DELETE SET NULL
+		);
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create table messages: %w", err)
 	}
 
 	return db, nil

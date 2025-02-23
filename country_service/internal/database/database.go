@@ -19,7 +19,7 @@ type DbConfiguration struct {
 }
 
 func NewDB() (*sql.DB, error) {
-	file, err := os.Open("../database/postgres_config.json")
+	file, err := os.Open("../internal/database/postgres_config.json")
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func NewDB() (*sql.DB, error) {
 		}
 	}
 
-	// Подключение к созданной базе данных networkdb
+	// Подключение к созданной базе данных
 	connString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s", conf.Host, conf.User, conf.Password, conf.DbName, conf.Port, conf.SslMode)
 	db, err := sql.Open("postgres", connString)
 	if err != nil {
