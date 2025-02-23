@@ -1,2 +1,2 @@
-# network
-My project to practice golang
+# mysocialnetwork
+This is my project to practice
