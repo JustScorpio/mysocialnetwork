@@ -18,29 +18,6 @@ func NewUserRepository(db *sql.DB, countryCacheRepo *CountryRepository) *UserRep
 	}
 }
 
-func (r *UserRepository) GetAllu() ([]models.User, error) {
-	rows, err := r.db.Query(`
-	SELECT id, username, mail 
-	FROM users
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var users []models.User
-	for rows.Next() {
-		var user models.User
-		err := rows.Scan(&user.Id, &user.UserName, &user.Mail)
-		if err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-
-	return users, nil
-}
-
 func (r *UserRepository) GetAll() ([]models.User, error) {
 	rows, err := r.db.Query(`
         SELECT 
