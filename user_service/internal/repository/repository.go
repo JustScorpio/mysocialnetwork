@@ -1,6 +1,6 @@
 package repository
 
-import "user_service/internal/models"
+import "mysocialnetwork/user_service/internal/models"
 
 type Repository[T models.Entity] interface {
 	GetAll() ([]T, error)

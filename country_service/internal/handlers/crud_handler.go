@@ -1,9 +1,9 @@
 package handlers
 
 import (
-	"country_service/internal/models"
-	"country_service/internal/services"
 	"encoding/json"
+	"mysocialnetwork/country_service/internal/models"
+	"mysocialnetwork/country_service/internal/services"
 	"net/http"
 	"strconv"
 )

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"database/sql"
-	"user_service/internal/models"
+	"mysocialnetwork/user_service/internal/models"
 )
 
 type CountryRepository struct {

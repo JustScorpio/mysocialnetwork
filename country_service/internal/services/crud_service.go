@@ -1,8 +1,8 @@
 package services
 
 import (
-	"country_service/internal/models"
-	"country_service/internal/repository"
+	"mysocialnetwork/country_service/internal/models"
+	"mysocialnetwork/country_service/internal/repository"
 )
 
 type CrudService[T models.Entity] struct {

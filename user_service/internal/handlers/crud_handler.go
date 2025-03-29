@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"mysocialnetwork/user_service/internal/models"
+	"mysocialnetwork/user_service/internal/services"
 	"net/http"
 	"strconv"
-	"user_service/internal/models"
-	"user_service/internal/services"
 )
 
 type CrudHandler[T models.Entity] struct {

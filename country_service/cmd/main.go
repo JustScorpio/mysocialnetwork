@@ -1,11 +1,11 @@
 package main
 
 import (
-	"country_service/internal/database"
-	"country_service/internal/handlers"
-	"country_service/internal/repository"
-	"country_service/internal/services"
 	"log"
+	"mysocialnetwork/country_service/internal/database"
+	"mysocialnetwork/country_service/internal/handlers"
+	"mysocialnetwork/country_service/internal/repository"
+	"mysocialnetwork/country_service/internal/services"
 	"net/http"
 )
 

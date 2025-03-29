@@ -2,12 +2,15 @@ package database
 
 import (
 	"database/sql"
+	_ "embed"
 	"encoding/json"
 	"fmt"
-	"os"
 
 	_ "github.com/lib/pq"
 )
+
+//go:embed postgres_config.json
+var configContent []byte
 
 type DbConfiguration struct {
 	Host     string
@@ -19,16 +22,8 @@ type DbConfiguration struct {
 }
 
 func NewDB() (*sql.DB, error) {
-	file, err := os.Open("../internal/database/postgres_config.json")
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	decoder := json.NewDecoder(file)
-	conf := DbConfiguration{}
-	err = decoder.Decode(&conf)
-	if err != nil {
+	var conf DbConfiguration
+	if err := json.Unmarshal(configContent, &conf); err != nil {
 		return nil, fmt.Errorf("failed to decode config: %w", err)
 	}
 

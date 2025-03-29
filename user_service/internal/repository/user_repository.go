@@ -3,7 +3,7 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"user_service/internal/models"
+	"mysocialnetwork/user_service/internal/models"
 )
 
 type UserRepository struct {
