@@ -2,11 +2,11 @@ package main
 
 import (
 	"log"
-	"mysocialnetwork/user_service/internal/database"
-	"mysocialnetwork/user_service/internal/handlers"
-	"mysocialnetwork/user_service/internal/repository"
-	"mysocialnetwork/user_service/internal/services"
 	"net/http"
+	"user_service/internal/database"
+	"user_service/internal/handlers"
+	"user_service/internal/repository"
+	"user_service/internal/services"
 )
 
 func main() {

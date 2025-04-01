@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -71,6 +72,32 @@ func (m *MicroserviceManager) BuildMicroservice(name string) error {
 	// Create bin directory if not exists
 	if err := os.MkdirAll(binDir, 0755); err != nil {
 		return fmt.Errorf("failed to create bin directory: %v", err)
+	}
+
+	// Run go mod init if needed
+	if _, err := os.Stat(filepath.Join(servicePath, "go.mod")); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			fmt.Printf("Running 'go mod init' for %s...\n", name)
+			tidyCmd := exec.Command("go", "mod", "init", name)
+			tidyCmd.Dir = servicePath
+			tidyCmd.Stdout = os.Stdout
+			tidyCmd.Stderr = os.Stderr
+			if err := tidyCmd.Run(); err != nil {
+				return fmt.Errorf("go mod init failed: %v", err)
+			}
+		} else {
+			return fmt.Errorf("Cannot check if go.mod file exists or not. See details: %v", err)
+		}
+	}
+
+	// Run go mod tidy
+	fmt.Printf("Running 'go mod tidy' for %s...\n", name)
+	tidyCmd := exec.Command("go", "mod", "tidy")
+	tidyCmd.Dir = servicePath
+	tidyCmd.Stdout = os.Stdout
+	tidyCmd.Stderr = os.Stderr
+	if err := tidyCmd.Run(); err != nil {
+		return fmt.Errorf("go mod tidy failed: %v", err)
 	}
 
 	// Build microservice

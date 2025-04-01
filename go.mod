@@ -2,7 +2,7 @@ module mysocialnetwork
 
 go 1.23
 
-toolchain go1.23.7
+toolchain go1.23.8
 
 require (
 	github.com/gorilla/sessions v1.4.0
